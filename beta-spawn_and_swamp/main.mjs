@@ -20,7 +20,7 @@ function has_body_type(creep, bodyType){
  */
 function creepWork(creep){
 
-    const resorce = getObjectsByPrototype(StructureContainer)
+    const resorce = getObjectsByPrototype(StructureContainer).filter(i => i.store.getUsedCapacity() > 0)
     const closestResorce = creep.findClosestByPath(resorce)
 
     if (creep.store.getFreeCapacity() === 0){
@@ -116,10 +116,10 @@ export function loop() {
     let myCreeps = getObjectsByPrototype(Creep).filter(i => i.my)
     let enemyCreeps = getObjectsByPrototype(Creep).filter(i => !i.my)
 
-    if (myCreeps.length < 4){
+    if (myCreeps.length < 2){
         mySpawn.spawnCreep([MOVE, CARRY, WORK])
     } else if (myCreeps.length < 14){
-        mySpawn.spawnCreep([ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, TOUGH, TOUGH, TOUGH])
+        mySpawn.spawnCreep([ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE, MOVE, TOUGH, TOUGH])
     }
 
     for (let i=0;i<myCreeps.length;i++){
@@ -128,7 +128,11 @@ export function loop() {
         if (has_body_type(myCreep, WORK)){
             creepWork(myCreep)
         } else if (has_body_type(myCreep, ATTACK)){
-            creepAttack(myCreep, enemyCreeps)
+            if(i%2==0){
+                creepAttack(myCreep, enemyCreeps)
+            } else {
+                creepAttackSpawn(myCreep)
+            }
         }
 
     }
